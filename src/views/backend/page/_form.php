@@ -88,7 +88,7 @@ use yii\web\View;
                             'fmDefaultPath' => '/static/origin/Page/' . $page->id,
                         ];
                         echo $form->field($model, 'content')->widget(
-                            \Besnovatyj\File\widgets\customeditor\src\CkeditorCustomWidget::class,
+                            \Besnovatyj\File\widgets\CkeditorCustomWidget::class,
                             $editorConfig,
                         )->label(false);
                         ?>
