@@ -85,7 +85,7 @@ use yii\web\View;
                         <?php
                         $editorConfig = [
                             'language'      => 'ru',
-                            'fmDefaultPath' => '/origin/Page/' . $page->id,
+                            'fmDefaultPath' => '/static/origin/Page/' . $page->id,
                         ];
                         echo $form->field($model, 'content')->widget(
                             \Besnovatyj\File\widgets\customeditor\src\CkeditorCustomWidget::class,
