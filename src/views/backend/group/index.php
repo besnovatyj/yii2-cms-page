@@ -7,7 +7,6 @@
 
 declare(strict_types=1);
 
-use Besnovatyj\Page\forms\backend\GroupForm;
 use Besnovatyj\TreeManager\Manager\TreeDataSource;
 use Besnovatyj\TreeManager\Manager\TreeWidget;
 use yii\helpers\Html;
@@ -47,10 +46,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     'moveNode'       => Url::to(['/Page/backend/group/move']),
                     'toggleStatus'   => Url::to(['/Page/backend/group/toggle-status']),
                     'checkIntegrity' => Url::to(['/Page/backend/group/check-integrity']),
-                ],
-                'forms'            => [
-                    'createFormClass' => GroupForm::class,
-                    'updateFormClass' => GroupForm::class,
                 ],
                 'serverForms'      => [
                     'enabled'       => true,
