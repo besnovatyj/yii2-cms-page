@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Besnovatyj\Page\migrations;
 
-use common\components\migration\BaseMigration;
+use Besnovatyj\Kernel\migration\BaseMigration;
 use yii\base\NotSupportedException;
 
 /** 'm<YYMMDD_HHMMSS>_<n>' */

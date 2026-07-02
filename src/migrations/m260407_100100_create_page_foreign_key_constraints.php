@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Besnovatyj\Page\migrations;
 
-use common\components\migration\BaseMigration;
+use Besnovatyj\Kernel\migration\BaseMigration;
 use Yii;
 use yii\db\Exception;
 
@@ -41,9 +41,9 @@ class m260407_100100_create_page_foreign_key_constraints extends BaseMigration
     public function safeDown(): void
     {
         // Отменяем действия по умолчанию,
-        // так как \common\components\migration\BaseMigration::safeDown() вызывает static::TABLE_NAME,
+        // так как \Besnovatyj\Kernel\migration\BaseMigration::safeDown() вызывает static::TABLE_NAME,
         // которого в данной миграции не существует.
-        // Так же, \common\components\migration\BaseMigration::safeDown() при удалении таблиц сам удалит у них все индексы и внешние ключи.
+        // Так же, \Besnovatyj\Kernel\migration\BaseMigration::safeDown() при удалении таблиц сам удалит у них все индексы и внешние ключи.
 
         // parent::safeDown();
     }
