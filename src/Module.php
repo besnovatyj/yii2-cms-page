@@ -9,11 +9,11 @@ declare(strict_types=1);
 namespace Besnovatyj\Page;
 
 use common\components\module\CmsModule;
-use modules\modman\contract\DeclaresModule;
-use modules\modman\contract\ProvidesAdminMenu;
-use modules\modman\contract\ProvidesDependencies;
-use modules\modman\contract\ProvidesDirectories;
-use modules\modman\contract\ProvidesMigrations;
+use Besnovatyj\Contracts\module\DeclaresModule;
+use Besnovatyj\Contracts\module\ProvidesAdminMenu;
+use Besnovatyj\Contracts\module\ProvidesDependencies;
+use Besnovatyj\Contracts\module\ProvidesDirectories;
+use Besnovatyj\Contracts\module\ProvidesMigrations;
 
 /**
  * Модуль управления статическими страницами
