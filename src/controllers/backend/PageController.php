@@ -19,9 +19,9 @@ use Besnovatyj\Page\forms\backend\PageSearch;
 use Besnovatyj\Page\services\manage\PageManageService;
 use Yii;
 use yii\base\InvalidConfigException;
-use yii\base\UnknownPropertyException;
 use yii\filters\VerbFilter;
 use yii\helpers\VarDumper;
+use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -211,47 +211,43 @@ class PageController extends Controller
     }
 
     /**
-     * AJAX-сохранение контента из CKEditor
+     * AJAX-сохранение контента из CKEditor (внешний виджет).
+     *
+     * Обработка ошибок делегирована {@see \yii\web\ErrorHandler}: клиентские ошибки — типизированный
+     * {@see BadRequestHttpException} (реальный HTTP 400 + сообщение); инфраструктурные исключения
+     * сервиса всплывают к ErrorHandler (в проде скрыты, в debug видны). Успех — конверт `{status:'success', ...}`.
+     *
+     * @throws BadRequestHttpException|NotFoundHttpException
      */
     public function actionAjaxSave(): array
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $response = ['status' => 'error'];
-
         if (!Yii::$app->request->isAjax) {
-            return $response;
+            throw new BadRequestHttpException('Ожидается AJAX-запрос.');
         }
 
-        try {
-            $content   = Yii::$app->request->post('editor_content') ?: '';
-            $id        = Yii::$app->request->post('model_id') ?: null;
-            $fieldName = Yii::$app->request->post('field_name') ?: null;
+        $content   = Yii::$app->request->post('editor_content') ?: '';
+        $id        = Yii::$app->request->post('model_id') ?: null;
+        $fieldName = Yii::$app->request->post('field_name') ?: null;
 
-            if (empty($id) || empty($fieldName)) {
-                $response['message'] = 'Сначала сохраните страницу обычным способом.';
-                return $response;
-            }
-
-            $page = $this->findModel((int)$id);
-
-            if (!isset($page->$fieldName)) {
-                throw new UnknownPropertyException('Несуществующее поле: ' . $fieldName);
-            }
-
-            $form = new PageForm($page);
-            $form->$fieldName = urldecode($content);
-
-            if ($form->validate()) {
-                $this->service->edit($page->id, $form);
-            }
-
-            $response['status']  = 'success';
-            $response['message'] = 'Сохранено!';
-        } catch (Exception $e) {
-            $this->ajaxError($e);
+        if (empty($id) || empty($fieldName)) {
+            throw new BadRequestHttpException('Сначала сохраните страницу обычным способом.');
         }
 
-        return $response;
+        $page = $this->findModel((int)$id);
+
+        if (!isset($page->$fieldName)) {
+            throw new BadRequestHttpException('Несуществующее поле: ' . $fieldName);
+        }
+
+        $form = new PageForm($page);
+        $form->$fieldName = urldecode($content);
+        if (!$form->validate()) {
+            throw new BadRequestHttpException('Ошибка валидации: ' . implode('; ', $form->getFirstErrors()));
+        }
+        $this->service->edit($page->id, $form);
+
+        return ['status' => 'success', 'message' => 'Сохранено!'];
     }
 
     /**
