@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Besnovatyj\Page\controllers\backend;
 
-use common\components\controller\ControllerTrait;
+use Besnovatyj\Kernel\controller\ControllerTrait;
 use Besnovatyj\Kernel\urlmanager\UrlManagerHelperTrait;
 use DomainException;
 use Exception;
