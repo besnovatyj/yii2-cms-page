@@ -1,6 +1,5 @@
 <?php
 
-
 /*
  * Copyright (c) 2026 Besnovatyj. Licensed under the MIT License.
  */
@@ -12,7 +11,6 @@ namespace Besnovatyj\Page\entities;
 use Besnovatyj\Meta\Meta;
 use Besnovatyj\Meta\MetaBehavior;
 use Besnovatyj\Page\entities\queries\PageQuery;
-use common\components\upload\behaviors\ImageUploadBehavior;
 use DomainException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
