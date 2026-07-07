@@ -35,7 +35,7 @@ class GroupController extends TreeController
                     'slug'  => $model->slug,
                 ];
             },
-            ['id', 'name', 'slug'],
+            'sort_order',
             'sort_order',
         );
 
