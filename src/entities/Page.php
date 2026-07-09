@@ -55,6 +55,7 @@ class Page extends ActiveRecord
         ?string $excerpt,
         ?string $content,
         Meta $meta,
+        int $status = self::STATUS_DRAFT,
         int $sortOrder = 0,
     ): self {
         $page = new static();
@@ -65,7 +66,7 @@ class Page extends ActiveRecord
         $page->content = $content;
         $page->meta = $meta;
         $page->sort_order = $sortOrder;
-        $page->status = self::STATUS_DRAFT;
+        $page->status = $status;
         return $page;
     }
 
@@ -79,6 +80,7 @@ class Page extends ActiveRecord
         ?string $excerpt,
         ?string $content,
         Meta $meta,
+        int $status,
         int $sortOrder = 0,
     ): void {
         $this->group_id = $groupId;
@@ -87,6 +89,7 @@ class Page extends ActiveRecord
         $this->excerpt = $excerpt;
         $this->content = $content;
         $this->meta = $meta;
+        $this->status = $status;
         $this->sort_order = $sortOrder;
     }
 

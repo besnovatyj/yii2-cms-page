@@ -48,6 +48,7 @@ readonly class PageManageService
                 $form->meta->description,
                 $form->meta->keywords,
             ),
+            status: $form->status,
             sortOrder: $form->sort_order,
         );
 
@@ -76,6 +77,7 @@ readonly class PageManageService
                 $form->meta->description,
                 $form->meta->keywords,
             ),
+            $form->status,
             $form->sort_order,
         );
         $this->pages->save($page);
