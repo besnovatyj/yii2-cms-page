@@ -80,6 +80,20 @@ class PageReadRepository
             ->all();
     }
 
+    /**
+     * Карта «slug => заголовок» опубликованных страниц (для выбора цели URL-алиаса в админке).
+     *
+     * @return array<string,string>
+     */
+    public function slugTitleMap(): array
+    {
+        return Page::find()->published()
+            ->select(['title', 'slug'])
+            ->orderBy(['title' => SORT_ASC])
+            ->indexBy('slug')
+            ->column();
+    }
+
     private function makeProvider(\yii\db\ActiveQuery $query): ActiveDataProvider
     {
         return new ActiveDataProvider([

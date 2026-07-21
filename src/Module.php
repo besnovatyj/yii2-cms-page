@@ -14,6 +14,10 @@ use Besnovatyj\Contracts\module\ProvidesAdminMenu;
 use Besnovatyj\Contracts\module\ProvidesDependencies;
 use Besnovatyj\Contracts\module\ProvidesDirectories;
 use Besnovatyj\Contracts\module\ProvidesMigrations;
+use Besnovatyj\Contracts\routing\AliasTarget;
+use Besnovatyj\Contracts\routing\AliasTargetProvider;
+use Besnovatyj\Page\readModels\GroupReadRepository;
+use Besnovatyj\Page\readModels\PageReadRepository;
 
 /**
  * Модуль управления статическими страницами
@@ -21,7 +25,7 @@ use Besnovatyj\Contracts\module\ProvidesMigrations;
 class Module extends CmsModule implements
     DeclaresModule, ProvidesAdminMenu,
     ProvidesDependencies, ProvidesDirectories,
-    ProvidesMigrations
+    ProvidesMigrations, AliasTargetProvider
 {
     public const bool EDITABLE = true;
     public const string VERSION = '2.0.0';
@@ -37,4 +41,31 @@ class Module extends CmsModule implements
     public static function migrationNamespace(): ?string { return __NAMESPACE__.'\\migrations'; }
     public static function directories(): array { return ['@static/origin/Page','@static/cache/Page'];}
 
+    /**
+     * Цели, которым можно назначить короткий URL (пилот канала алиасов, ср. пилот Blog для URL-правил).
+     * Реализация {@see AliasTargetProvider}; вызывается только модулем алиасов, если он установлен.
+     *
+     * @return AliasTarget[]
+     */
+    public function aliasTargets(): array
+    {
+        return [
+            new AliasTarget('/Page/page/view', 'Страница', 'slug'),
+            new AliasTarget('/Page/page/group', 'Раздел страниц', 'slug'),
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return array<string,string>
+     */
+    public function aliasSlugs(string $route): array
+    {
+        return match (ltrim($route, '/')) {
+            'Page/page/view' => (new PageReadRepository())->slugTitleMap(),
+            'Page/page/group' => (new GroupReadRepository())->slugNameMap(),
+            default => [],
+        };
+    }
 }

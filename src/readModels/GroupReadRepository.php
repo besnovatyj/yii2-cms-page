@@ -61,4 +61,18 @@ class GroupReadRepository
     {
         return $this->treeScope->dropdownTree(excludeNodeId: $excludeId);
     }
+
+    /**
+     * Карта «slug => название» активных групп (для выбора цели URL-алиаса в админке).
+     *
+     * @return array<string,string>
+     */
+    public function slugNameMap(): array
+    {
+        return Group::find()->active()
+            ->select(['name', 'slug'])
+            ->orderBy(['name' => SORT_ASC])
+            ->indexBy('slug')
+            ->column();
+    }
 }
