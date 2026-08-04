@@ -16,6 +16,8 @@ use Besnovatyj\Contracts\module\ProvidesDirectories;
 use Besnovatyj\Contracts\module\ProvidesMigrations;
 use Besnovatyj\Contracts\routing\AliasTarget;
 use Besnovatyj\Contracts\routing\AliasTargetProvider;
+use Besnovatyj\Contracts\menu\MenuTarget;
+use Besnovatyj\Contracts\menu\MenuTargetProvider;
 use Besnovatyj\Page\readModels\GroupReadRepository;
 use Besnovatyj\Page\readModels\PageReadRepository;
 
@@ -25,7 +27,7 @@ use Besnovatyj\Page\readModels\PageReadRepository;
 class Module extends CmsModule implements
     DeclaresModule, ProvidesAdminMenu,
     ProvidesDependencies, ProvidesDirectories,
-    ProvidesMigrations, AliasTargetProvider
+    ProvidesMigrations, AliasTargetProvider, MenuTargetProvider
 {
     public const bool EDITABLE = true;
     public const string VERSION = '2.0.0';
@@ -65,6 +67,34 @@ class Module extends CmsModule implements
         return match (ltrim($route, '/')) {
             'Page/page/view' => (new PageReadRepository())->slugTitleMap(),
             'Page/page/group' => (new GroupReadRepository())->slugNameMap(),
+            default => [],
+        };
+    }
+
+    /**
+     * Цели для построения пунктов меню. Те же роуты, что и у канала алиасов, но отдельный контракт
+     * {@see MenuTargetProvider} — меню строит навигационный узел с именем, а не rewrite URL.
+     *
+     * @return MenuTarget[]
+     */
+    public function menuTargets(): array
+    {
+        return [
+            new MenuTarget('/Page/page/group', 'Раздел страниц', 'slug'),
+            new MenuTarget('/Page/page/view', 'Страница', 'slug'),
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return array<string,string>
+     */
+    public function menuCandidates(string $route): array
+    {
+        return match (ltrim($route, '/')) {
+            'Page/page/group' => (new GroupReadRepository())->slugNameMap(),
+            'Page/page/view' => (new PageReadRepository())->slugTitleMap(),
             default => [],
         };
     }
