@@ -1,6 +1,5 @@
 <?php
 
-
 /*
  * Copyright (c) 2026 Besnovatyj. Licensed under the MIT License.
  */
@@ -31,8 +30,7 @@ foreach ($breadcrumbs as $crumb) {
 }
 ?>
 
-<div class="page-group">
-
+<section class="container mt-3 mb-5">
     <header class="mb-4">
         <h1><?= Html::encode($group->name) ?></h1>
         <?php if (!empty($group->description)): ?>
@@ -45,7 +43,7 @@ foreach ($breadcrumbs as $crumb) {
         'emptyText'    => '<p class="text-muted">В этом разделе пока нет страниц.</p>',
         'itemView'     => static function (Page $page): string {
             $url   = Url::to(['/Page/page/view', 'slug' => $page->slug]);
-            $title = Html::a(Html::encode($page->title), $url, ['class' => 'text-decoration-none']);
+            $title = Html::a(Html::encode($page->title), $url, ['class' => 'fw-medium text-decoration-none']);
 
             $excerpt = '';
             if (!empty($page->excerpt)) {
@@ -62,7 +60,6 @@ foreach ($breadcrumbs as $crumb) {
                 . '</div>'
                 . '</div>';
         },
-        'layout'       => '<div class="list-group list-group-flush">{items}</div>{pager}',
+        'layout'       => '<div class="list-group list-group-flush">{items}</div><div class="mt-4 text-center">{pager}</div>',
     ]) ?>
-
-</div>
+</section>
