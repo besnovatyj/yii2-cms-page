@@ -39,6 +39,8 @@ class m250226_130300_create_page_pages_table extends BaseMigration
             'slug' => $this->string(255)->notNull()
                 ->comment('Slug страницы'),
             'content' => 'LONGTEXT NULL DEFAULT NULL COMMENT "Контент страницы"',
+            'template' => $this->string(64)->null()->defaultValue(null)
+                ->comment('Ключ варианта представления темы; NULL = базовый шаблон'),
             'meta_json' => $this->text()->notNull()
                 ->comment('JSON of meta-obj'),
             'is_markdown' => $this->smallInteger(1)->notNull()->defaultValue(0)

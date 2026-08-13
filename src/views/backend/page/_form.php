@@ -126,6 +126,11 @@ use yii\web\View;
                     'class' => 'form-control',
                     'min'   => 0,
                 ])->hint('Меньшее число = выше в списке') ?>
+
+                <?= $form->field($model, 'template')->dropDownList(
+                    $model->templateOptions(),
+                    ['class' => 'form-select'],
+                )->hint('Шаблон оформления из активной темы') ?>
             </div>
             <div class="card-footer">
                 <div class="d-grid">

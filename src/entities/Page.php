@@ -26,6 +26,7 @@ use yii\db\Expression;
  * @property string      $slug
  * @property string|null $excerpt
  * @property string|null $content
+ * @property string|null $template
  * @property int         $status
  * @property int         $sort_order
  * @property string      $created_at
@@ -42,6 +43,12 @@ class Page extends ActiveRecord
     public const int STATUS_PUBLISHED = 1;
     public const int STATUS_ARCHIVED = 2;
 
+    /**
+     * Слот выбираемого варианта представления страницы (см. `ViewVariantsManifest::slot()`).
+     * Единый источник для формы (валидация), бэкенд-вьюхи (выпадашка) и фронтенд-контроллёра (рендер).
+     */
+    public const string VIEW_SLOT = 'Page:frontend/page/view';
+
     /** @var Meta */
     public Meta $meta;
 
@@ -57,6 +64,7 @@ class Page extends ActiveRecord
         Meta $meta,
         int $status = self::STATUS_DRAFT,
         int $sortOrder = 0,
+        ?string $template = null,
     ): self {
         $page = new static();
         $page->group_id = $groupId;
@@ -67,6 +75,7 @@ class Page extends ActiveRecord
         $page->meta = $meta;
         $page->sort_order = $sortOrder;
         $page->status = $status;
+        $page->template = $template;
         return $page;
     }
 
@@ -82,6 +91,7 @@ class Page extends ActiveRecord
         Meta $meta,
         int $status,
         int $sortOrder = 0,
+        ?string $template = null,
     ): void {
         $this->group_id = $groupId;
         $this->title = $title;
@@ -91,6 +101,7 @@ class Page extends ActiveRecord
         $this->meta = $meta;
         $this->status = $status;
         $this->sort_order = $sortOrder;
+        $this->template = $template;
     }
 
     // <editor-fold desc="Статусы">

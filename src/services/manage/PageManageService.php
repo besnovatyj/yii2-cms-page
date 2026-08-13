@@ -50,6 +50,7 @@ readonly class PageManageService
             ),
             status: $form->status,
             sortOrder: $form->sort_order,
+            template: $form->template ?: null,
         );
 
         $this->pages->save($page);
@@ -79,6 +80,7 @@ readonly class PageManageService
             ),
             $form->status,
             $form->sort_order,
+            $form->template ?: null,
         );
         $this->pages->save($page);
     }

@@ -9,11 +9,13 @@ declare(strict_types=1);
 
 namespace Besnovatyj\Page\forms\backend;
 
+use Besnovatyj\Contracts\theme\ViewVariantCatalog;
 use Besnovatyj\Forms\CompositeForm;
 use Besnovatyj\Helpers\StringHelper;
 use Besnovatyj\Meta\MetaForm;
 use Besnovatyj\Page\entities\Page;
 use Besnovatyj\Validators\SlugValidator;
+use Yii;
 use yii\helpers\Inflector;
 
 /**
@@ -28,6 +30,7 @@ class PageForm extends CompositeForm
     public string $slug = '';
     public string $excerpt = '';
     public string $content = '';
+    public string $template = '';
     public int $status = Page::STATUS_DRAFT;
     public int $sort_order = 0;
 
@@ -49,6 +52,7 @@ class PageForm extends CompositeForm
             $this->slug = $page->slug;
             $this->excerpt = (string)$page->excerpt;
             $this->content = (string)$page->content;
+            $this->template = (string)$page->template;
             $this->status = $page->status;
             $this->sort_order = $page->sort_order;
             $this->meta = new MetaForm($page->meta);
@@ -68,6 +72,8 @@ class PageForm extends CompositeForm
             ['status', 'in', 'range' => [Page::STATUS_DRAFT, Page::STATUS_PUBLISHED, Page::STATUS_ARCHIVED]],
             ['sort_order', 'default', 'value' => 0],
             [['excerpt', 'content'], 'string'],
+            // Пусто = базовый шаблон (разрешено). Иначе — только ключ, реально предлагаемый темой.
+            ['template', 'in', 'range' => array_keys($this->templateOptions()), 'skipOnEmpty' => true],
             ['slug', SlugValidator::class],
             [
                 'slug',
@@ -87,6 +93,7 @@ class PageForm extends CompositeForm
             'slug'       => 'Slug (заполнится автоматически)',
             'excerpt'    => 'Краткое описание (для превью)',
             'content'    => 'Контент',
+            'template'   => 'Шаблон представления',
             'status'     => 'Статус',
             'sort_order' => 'Порядок сортировки',
         ];
@@ -95,5 +102,22 @@ class PageForm extends CompositeForm
     protected function internalForms(): array
     {
         return ['meta'];
+    }
+
+    /**
+     * Опции выпадашки шаблона: базовый вариант + предлагаемые активной темой (`ключ => метка`).
+     *
+     * Каталог резолвится защитно: нет пакета тем (биндинг {@see ViewVariantCatalog} отсутствует) —
+     * остаётся только «По умолчанию», страница рендерится базовым представлением.
+     *
+     * @return array<string,string>
+     */
+    public function templateOptions(): array
+    {
+        $variants = Yii::$container->has(ViewVariantCatalog::class)
+            ? Yii::$container->get(ViewVariantCatalog::class)->getVariants(Page::VIEW_SLOT)
+            : [];
+
+        return ['' => 'По умолчанию (шаблон темы)'] + $variants;
     }
 }

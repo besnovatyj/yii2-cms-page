@@ -9,8 +9,12 @@ declare(strict_types=1);
 
 namespace Besnovatyj\Page\controllers\frontend;
 
+use Besnovatyj\Contracts\theme\ViewVariantCatalog;
+use Besnovatyj\Contracts\theme\ViewVariantsManifest;
+use Besnovatyj\Page\entities\Page;
 use Besnovatyj\Page\readModels\GroupReadRepository;
 use Besnovatyj\Page\readModels\PageReadRepository;
+use Yii;
 use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -53,10 +57,32 @@ class PageController extends Controller
         }
         $breadcrumbs[] = ['label' => $page->title];
 
-        return $this->render('view', [
+        return $this->render($this->resolveView($page), [
             'page'        => $page,
             'breadcrumbs' => $breadcrumbs,
         ]);
+    }
+
+    /**
+     * Имя представления с учётом выбранного в админке варианта темы.
+     *
+     * Базовое `view` либо `view.variants/{ключ}` — но только если активная тема реально предлагает
+     * этот вариант для слота {@see Page::VIEW_SLOT} (сохранённый ключ мог протухнуть после смены темы).
+     * Каталог резолвится защитно: без пакета тем биндинг отсутствует — рендерим базовое представление.
+     * Оверлей темы подхватит `view.variants/{ключ}.php` по тому же pathMap, что и обычные вьюхи.
+     */
+    private function resolveView(Page $page): string
+    {
+        $variant = (string)$page->template;
+        if ($variant === '' || !Yii::$container->has(ViewVariantCatalog::class)) {
+            return 'view';
+        }
+
+        $catalog = Yii::$container->get(ViewVariantCatalog::class);
+
+        return $catalog->hasVariant(Page::VIEW_SLOT, $variant)
+            ? 'view' . ViewVariantsManifest::VARIANTS_DIR_SUFFIX . '/' . $variant
+            : 'view';
     }
 
     /**
