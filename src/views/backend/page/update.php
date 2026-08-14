@@ -24,10 +24,10 @@ $this->params['breadcrumbs'][] = ['label' => $page->title, 'url' => ['view', 'id
 $this->params['breadcrumbs'][] = 'Update';
 ?>
 
-<div class="d-flex flex-column gap-2">
+<p>
 
     <!-- Просмотр на сайте -->
-    <a class="btn btn-outline-secondary w-100" target="_blank" href="<?= $absoluteFrontendUrl ?>">
+    <a class="btn btn-outline-secondary" target="_blank" href="<?= $absoluteFrontendUrl ?>">
         <i class="bi bi-eye me-1"></i>Просмотр на сайте
     </a>
 
@@ -48,7 +48,7 @@ $this->params['breadcrumbs'][] = 'Update';
         </div>
     </div>
 
-</div>
+</p>
 
 <div class="page-update">
     <?= $this->render('_form', [
