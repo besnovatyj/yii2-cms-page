@@ -24,7 +24,6 @@ $this->params['breadcrumbs'][] = ['label' => $page->title, 'url' => ['view', 'id
 $this->params['breadcrumbs'][] = 'Update';
 ?>
 
-<?php $this->beginBlock('pageRight.Actions'); ?>
 <div class="d-flex flex-column gap-2">
 
     <!-- Просмотр на сайте -->
@@ -50,7 +49,6 @@ $this->params['breadcrumbs'][] = 'Update';
     </div>
 
 </div>
-<?php $this->endBlock(); ?>
 
 <div class="page-update">
     <?= $this->render('_form', [
