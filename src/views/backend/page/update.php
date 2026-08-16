@@ -24,7 +24,7 @@ $this->params['breadcrumbs'][] = ['label' => $page->title, 'url' => ['view', 'id
 $this->params['breadcrumbs'][] = 'Update';
 ?>
 
-<p>
+<div class="pb-3">
 
     <!-- Просмотр на сайте -->
     <a class="btn btn-outline-secondary" target="_blank" href="<?= $absoluteFrontendUrl ?>">
@@ -44,7 +44,7 @@ $this->params['breadcrumbs'][] = 'Update';
         'buttonClass' => 'btn btn-outline-info',
     ]) ?>
 
-</p>
+</div>
 
 <div class="page-update">
     <?= $this->render('_form', [
