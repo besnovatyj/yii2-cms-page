@@ -39,14 +39,10 @@ $this->params['breadcrumbs'][] = 'Update';
     ]) ?>
 
     <!-- Доступные шорткоды -->
-    <div class="card border-info border-opacity-50">
-        <div class="card-header py-2 text-info-emphasis small">
-            <i class="bi bi-braces me-1"></i>Доступные шорткоды
-        </div>
-        <div class="card-body p-2">
-            <?= \Besnovatyj\Shortcode\widgets\ShortcodesList::widget() ?>
-        </div>
-    </div>
+    <?= \Besnovatyj\Shortcode\widgets\shortcodesList\ShortcodesList::widget([
+        'buttonLabel' => 'Доступные шорткоды',
+        'buttonClass' => 'btn btn-outline-info',
+    ]) ?>
 
 </p>
 
