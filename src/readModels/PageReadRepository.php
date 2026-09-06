@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Besnovatyj\Page\readModels;
 
+use Besnovatyj\Contracts\search\SearchDocument;
 use Besnovatyj\Page\entities\Group;
 use Besnovatyj\Page\entities\Page;
 use Besnovatyj\TreeManager\Manager\TreeQueryScope;
@@ -92,6 +93,36 @@ class PageReadRepository
             ->orderBy(['title' => SORT_ASC])
             ->indexBy('slug')
             ->column();
+    }
+
+    /**
+     * Опубликованные страницы для сквозного поиска.
+     *
+     * Отдаёт ровно то, что доступно анонимному посетителю: черновики и архив в публичный индекс
+     * попасть не должны. Читает пачками и отдаёт генератором — полная переиндексация не должна
+     * держать в памяти весь контент сайта.
+     *
+     * @return iterable<SearchDocument>
+     */
+    public function searchDocuments(): iterable
+    {
+        $query = Page::find()->published()->orderBy(['id' => SORT_ASC]);
+
+        /** @var Page $page */
+        foreach ($query->each(100) as $page) {
+            yield new SearchDocument(
+                type: 'page.page',
+                entityId: (int)$page->id,
+                route: '/Page/page/view',
+                params: ['slug' => $page->slug],
+                title: (string)$page->title,
+                text: (string)$page->content,
+                keywords: (string)($page->meta->keywords ?? ''),
+                excerpt: $page->excerpt,
+                // created_at здесь DATETIME-строка, а контракт ждёт Unix-timestamp.
+                date: $page->created_at === null ? null : (strtotime($page->created_at) ?: null),
+            );
+        }
     }
 
     private function makeProvider(\yii\db\ActiveQuery $query): ActiveDataProvider

@@ -18,6 +18,8 @@ use Besnovatyj\Contracts\routing\AliasTarget;
 use Besnovatyj\Contracts\routing\AliasTargetProvider;
 use Besnovatyj\Contracts\menu\MenuTarget;
 use Besnovatyj\Contracts\menu\MenuTargetProvider;
+use Besnovatyj\Contracts\search\SearchableProvider;
+use Besnovatyj\Contracts\search\SearchSource;
 use Besnovatyj\Page\readModels\GroupReadRepository;
 use Besnovatyj\Page\readModels\PageReadRepository;
 
@@ -27,7 +29,7 @@ use Besnovatyj\Page\readModels\PageReadRepository;
 class Module extends CmsModule implements
     DeclaresModule, ProvidesAdminMenu,
     ProvidesDependencies, ProvidesDirectories,
-    ProvidesMigrations, AliasTargetProvider, MenuTargetProvider
+    ProvidesMigrations, AliasTargetProvider, MenuTargetProvider, SearchableProvider
 {
     public const bool EDITABLE = true;
     public const string VERSION = '2.0.0';
@@ -95,6 +97,32 @@ class Module extends CmsModule implements
         return match (ltrim($route, '/')) {
             'Page/page/group' => (new GroupReadRepository())->slugNameMap(),
             'Page/page/view' => (new PageReadRepository())->slugTitleMap(),
+            default => [],
+        };
+    }
+
+    /**
+     * Контент модуля для сквозного поиска. Реализация {@see SearchableProvider}; вызывается
+     * только модулем поиска, если он установлен.
+     *
+     * @return SearchSource[]
+     */
+    public function searchSources(): array
+    {
+        return [
+            new SearchSource('page.page', 'Страницы', 1.0, 'bi bi-file-text'),
+            new SearchSource('page.group', 'Разделы страниц', 0.7, 'bi bi-diagram-3'),
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function searchDocuments(string $type): iterable
+    {
+        return match ($type) {
+            'page.page' => (new PageReadRepository())->searchDocuments(),
+            'page.group' => (new GroupReadRepository())->searchDocuments(),
             default => [],
         };
     }
