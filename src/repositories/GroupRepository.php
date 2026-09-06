@@ -38,4 +38,24 @@ class GroupRepository
             ->andWhere(['group_id' => $groupId])
             ->exists();
     }
+
+    /**
+     * Карта «slug => название» активных разделов — для выбора цели URL-алиаса и пункта меню
+     * в админке.
+     *
+     * Фильтр по собственному статусу раздела, без проверки предков: администратор вправе назначить
+     * адрес разделу внутри временно скрытой ветки. Фронтовый аналог
+     * {@see \Besnovatyj\Page\readModels\GroupReadRepository::slugNameMap()} строже — он показывает
+     * только доступное посетителю.
+     *
+     * @return array<string,string>
+     */
+    public function slugNameMap(): array
+    {
+        return Group::find()->active()
+            ->select(['name', 'slug'])
+            ->orderBy(['name' => SORT_ASC])
+            ->indexBy('slug')
+            ->column();
+    }
 }

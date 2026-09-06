@@ -25,6 +25,26 @@ class PageQuery extends ActiveQuery
     }
 
     /**
+     * Страница доступна анонимному посетителю: опубликована сама И лежит в видимом разделе.
+     *
+     * Одной публикации мало: скрытый раздел не должен «протекать» на фронт своими страницами ни
+     * через списки, ни через прямую ссылку. Раздел проверяется целиком, вместе с предками
+     * (см. {@see GroupQuery::visible()}).
+     *
+     * Страница без раздела (`group_id` NULL) видна: скрывать её не за что.
+     */
+    public function visible(?string $alias = null): static
+    {
+        $column = ($alias ? $alias . '.' : '') . 'group_id';
+
+        return $this->published()->andWhere([
+            'or',
+            [$column => null],
+            [$column => \Besnovatyj\Page\entities\Group::find()->visible()->select('id')],
+        ]);
+    }
+
+    /**
      * Только черновики
      */
     public function draft(): static

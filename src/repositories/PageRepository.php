@@ -68,6 +68,26 @@ class PageRepository
     /**
      * Проверить существование страниц в заданной группе
      */
+    /**
+     * Карта «slug => заголовок» опубликованных страниц — для выбора цели URL-алиаса и пункта меню
+     * в админке.
+     *
+     * Фильтр здесь по публикации самой страницы, без учёта видимости раздела: администратор вправе
+     * назначить адрес странице скрытого раздела заранее — раздел откроют позже. Фронтовый аналог
+     * {@see \Besnovatyj\Page\readModels\PageReadRepository::slugTitleMap()} строже: он показывает
+     * только реально доступное посетителю.
+     *
+     * @return array<string,string>
+     */
+    public function slugTitleMap(): array
+    {
+        return Page::find()->published()
+            ->select(['title', 'slug'])
+            ->orderBy(['title' => SORT_ASC])
+            ->indexBy('slug')
+            ->column();
+    }
+
     public function existsByGroup(int $groupId): bool
     {
         return Page::find()->andWhere(['group_id' => $groupId])->exists();

@@ -14,7 +14,11 @@ use Besnovatyj\Page\entities\Group;
 use Besnovatyj\TreeManager\Manager\TreeQueryScope;
 
 /**
- * Read-репозиторий для групп страниц (frontend)
+ * Чтение разделов страниц ДЛЯ ФРОНТЕНДА.
+ *
+ * Отдаёт только видимые разделы: опубликованные и не спрятанные ни одним из предков
+ * (см. {@see \Besnovatyj\Page\entities\queries\GroupQuery::visible()}). Списки для админки —
+ * в {@see \Besnovatyj\Page\repositories\GroupRepository}.
  */
 class GroupReadRepository
 {
@@ -26,11 +30,11 @@ class GroupReadRepository
     }
 
     /**
-     * Найти активную группу по slug
+     * Найти доступный посетителю раздел по slug (сам активен и предки не скрыты)
      */
     public function findBySlug(string $slug): ?Group
     {
-        return Group::find()->active()->andWhere(['slug' => $slug])->one();
+        return Group::find()->visible()->andWhere(['slug' => $slug])->one();
     }
 
     /**
@@ -41,7 +45,7 @@ class GroupReadRepository
     public function getRoots(): array
     {
         return $this->treeScope->rootsQuery()
-            ->andWhere(['status' => 1])
+            ->andWhere(['status' => Group::STATUS_ACTIVE])
             ->all();
     }
 
@@ -70,7 +74,7 @@ class GroupReadRepository
      */
     public function slugNameMap(): array
     {
-        return Group::find()->active()
+        return Group::find()->visible()
             ->select(['name', 'slug'])
             ->orderBy(['name' => SORT_ASC])
             ->indexBy('slug')
@@ -88,7 +92,7 @@ class GroupReadRepository
      */
     public function searchDocuments(): iterable
     {
-        $query = Group::find()->active()->orderBy(['id' => SORT_ASC]);
+        $query = Group::find()->visible()->orderBy(['id' => SORT_ASC]);
 
         /** @var Group $group */
         foreach ($query->each(100) as $group) {

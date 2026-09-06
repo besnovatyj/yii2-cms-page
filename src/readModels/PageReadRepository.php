@@ -17,7 +17,12 @@ use yii\data\ActiveDataProvider;
 use yii\data\DataProviderInterface;
 
 /**
- * Read-репозиторий для получения страниц (frontend)
+ * Чтение страниц ДЛЯ ФРОНТЕНДА.
+ *
+ * Каждый метод отдаёт только доступное анонимному посетителю: страница опубликована и лежит в
+ * видимом разделе (см. {@see \Besnovatyj\Page\entities\queries\PageQuery::visible()}).
+ * Выборки для админки, которой положено видеть скрытое, — в
+ * {@see \Besnovatyj\Page\repositories\PageRepository}.
  */
 class PageReadRepository
 {
@@ -29,19 +34,19 @@ class PageReadRepository
     }
 
     /**
-     * Найти опубликованную страницу по slug
+     * Найти доступную посетителю страницу по slug (опубликована и раздел не скрыт)
      */
     public function findBySlug(string $slug): ?Page
     {
-        return Page::find()->published()->andWhere(['slug' => $slug])->one();
+        return Page::find()->visible()->andWhere(['slug' => $slug])->one();
     }
 
     /**
-     * Найти страницу по ID (только опубликованные)
+     * Найти доступную посетителю страницу по ID
      */
     public function find(int $id): ?Page
     {
-        return Page::find()->published()->andWhere(['id' => $id])->one();
+        return Page::find()->visible()->andWhere(['id' => $id])->one();
     }
 
     /**
@@ -50,7 +55,7 @@ class PageReadRepository
     public function getAllByGroup(Group $group): DataProviderInterface
     {
         $groupIds = $this->treeScope->descendantIds($group, andSelf: true);
-        $query = Page::find()->published()
+        $query = Page::find()->visible()
             ->andWhere(['group_id' => $groupIds])
             ->orderBy(['sort_order' => SORT_ASC, 'created_at' => SORT_DESC]);
 
@@ -62,7 +67,7 @@ class PageReadRepository
      */
     public function getAllWithoutGroup(): DataProviderInterface
     {
-        $query = Page::find()->published()->withoutGroup()
+        $query = Page::find()->visible()->withoutGroup()
             ->orderBy(['sort_order' => SORT_ASC, 'created_at' => SORT_DESC]);
 
         return $this->makeProvider($query);
@@ -75,7 +80,7 @@ class PageReadRepository
      */
     public function getAllPublished(int $limit = 100): array
     {
-        return Page::find()->published()
+        return Page::find()->visible()
             ->orderBy(['sort_order' => SORT_ASC, 'created_at' => SORT_DESC])
             ->limit($limit)
             ->all();
@@ -88,7 +93,7 @@ class PageReadRepository
      */
     public function slugTitleMap(): array
     {
-        return Page::find()->published()
+        return Page::find()->visible()
             ->select(['title', 'slug'])
             ->orderBy(['title' => SORT_ASC])
             ->indexBy('slug')
@@ -106,7 +111,7 @@ class PageReadRepository
      */
     public function searchDocuments(): iterable
     {
-        $query = Page::find()->published()->orderBy(['id' => SORT_ASC]);
+        $query = Page::find()->visible()->orderBy(['id' => SORT_ASC]);
 
         /** @var Page $page */
         foreach ($query->each(100) as $page) {

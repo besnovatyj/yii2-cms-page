@@ -35,6 +35,12 @@ use yii\db\ActiveQuery;
  */
 class Group extends Node
 {
+    /** Раздел скрыт: ни он сам, ни его страницы не доступны на фронте. */
+    public const int STATUS_INACTIVE = 0;
+
+    /** Раздел опубликован. */
+    public const int STATUS_ACTIVE = 1;
+
     /** @var Meta */
     public Meta $meta;
 
@@ -67,7 +73,15 @@ class Group extends Node
      */
     public function changeStatus(): void
     {
-        $this->status = $this->status ? 0 : 1;
+        $this->status = $this->isActive() ? self::STATUS_INACTIVE : self::STATUS_ACTIVE;
+    }
+
+    /**
+     * Опубликован ли сам раздел (без учёта предков — их проверяет {@see GroupQuery::visible()}).
+     */
+    public function isActive(): bool
+    {
+        return (int)$this->status === self::STATUS_ACTIVE;
     }
 
     /**

@@ -22,6 +22,8 @@ use Besnovatyj\Contracts\search\SearchableProvider;
 use Besnovatyj\Contracts\search\SearchSource;
 use Besnovatyj\Page\readModels\GroupReadRepository;
 use Besnovatyj\Page\readModels\PageReadRepository;
+use Besnovatyj\Page\repositories\GroupRepository;
+use Besnovatyj\Page\repositories\PageRepository;
 
 /**
  * Модуль управления статическими страницами
@@ -67,8 +69,8 @@ class Module extends CmsModule implements
     public function aliasSlugs(string $route): array
     {
         return match (ltrim($route, '/')) {
-            'Page/page/view' => (new PageReadRepository())->slugTitleMap(),
-            'Page/page/group' => (new GroupReadRepository())->slugNameMap(),
+            'Page/page/view' => (new PageRepository())->slugTitleMap(),
+            'Page/page/group' => (new GroupRepository())->slugNameMap(),
             default => [],
         };
     }
@@ -95,8 +97,8 @@ class Module extends CmsModule implements
     public function menuCandidates(string $route): array
     {
         return match (ltrim($route, '/')) {
-            'Page/page/group' => (new GroupReadRepository())->slugNameMap(),
-            'Page/page/view' => (new PageReadRepository())->slugTitleMap(),
+            'Page/page/group' => (new GroupRepository())->slugNameMap(),
+            'Page/page/view' => (new PageRepository())->slugTitleMap(),
             default => [],
         };
     }
