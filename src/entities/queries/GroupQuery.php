@@ -35,7 +35,8 @@ class GroupQuery extends ActiveQuery
      *
      * Скрытие родителя обязано скрывать всю ветку — иначе дочерний раздел остаётся открыт по
      * прямой ссылке, хотя из навигации он исчез. Проверка идёт по ключам Nested Sets одним
-     * подзапросом; виртуальный корень (`depth = 0`) исключён — он служебный и статуса не имеет.
+     * подзапросом, и проверяются предки ЛЮБОГО уровня, включая корневые (`depth = 0`): корень —
+     * такой же полноценный раздел с редактируемым статусом, а не служебный контейнер.
      */
     public function visible(?string $alias = null): static
     {
@@ -48,7 +49,6 @@ class GroupQuery extends ActiveQuery
             ->where(new Expression(
                 "anc.[[tree]] = {$self}.[[tree]] AND anc.[[lft]] < {$self}.[[lft]] AND anc.[[rgt]] > {$self}.[[rgt]]",
             ))
-            ->andWhere(['>', 'anc.depth', 0])
             ->andWhere(['<>', 'anc.status', Group::STATUS_ACTIVE]);
 
         return $this->active($alias)->andWhere(['not exists', $hiddenAncestor]);

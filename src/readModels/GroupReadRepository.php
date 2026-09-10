@@ -44,9 +44,7 @@ class GroupReadRepository
      */
     public function getRoots(): array
     {
-        return $this->treeScope->rootsQuery()
-            ->andWhere(['status' => Group::STATUS_ACTIVE])
-            ->all();
+        return $this->treeScope->rootsQuery()->visible()->all();
     }
 
     /**
