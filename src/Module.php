@@ -20,6 +20,10 @@ use Besnovatyj\Contracts\menu\MenuTarget;
 use Besnovatyj\Contracts\menu\MenuTargetProvider;
 use Besnovatyj\Contracts\search\SearchableProvider;
 use Besnovatyj\Contracts\search\SearchSource;
+use Besnovatyj\Contracts\sitemap\ChangeFrequency;
+use Besnovatyj\Contracts\sitemap\SitemapFreshness;
+use Besnovatyj\Contracts\sitemap\SitemapProvider;
+use Besnovatyj\Contracts\sitemap\SitemapSection;
 use Besnovatyj\Page\readModels\GroupReadRepository;
 use Besnovatyj\Page\readModels\PageReadRepository;
 use Besnovatyj\Page\repositories\GroupRepository;
@@ -31,7 +35,8 @@ use Besnovatyj\Page\repositories\PageRepository;
 class Module extends CmsModule implements
     DeclaresModule, ProvidesAdminMenu,
     ProvidesDependencies, ProvidesDirectories,
-    ProvidesMigrations, AliasTargetProvider, MenuTargetProvider, SearchableProvider
+    ProvidesMigrations, AliasTargetProvider, MenuTargetProvider, SearchableProvider,
+    SitemapProvider, SitemapFreshness
 {
     public const bool EDITABLE = true;
     public const string VERSION = '2.0.0';
@@ -126,6 +131,63 @@ class Module extends CmsModule implements
             'page.page' => (new PageReadRepository())->searchDocuments(),
             'page.group' => (new GroupReadRepository())->searchDocuments(),
             default => [],
+        };
+    }
+
+    /**
+     * Разделы карты сайта. Реализация {@see SitemapProvider}; вызывается только модулем карты,
+     * если он установлен.
+     *
+     * Отдельный контракт от поискового: в карту идут те же сущности, но с другими полями —
+     * дата изменения и приоритет вместо текста и даты публикации.
+     *
+     * @return SitemapSection[]
+     */
+    public function sitemapSections(): array
+    {
+        return [
+            new SitemapSection(
+                key: 'page.group',
+                label: 'Разделы страниц',
+                changeFrequency: ChangeFrequency::Monthly,
+                priority: 0.5,
+                order: 10,
+                icon: 'bi bi-diagram-3',
+            ),
+            new SitemapSection(
+                key: 'page.page',
+                label: 'Страницы',
+                changeFrequency: ChangeFrequency::Weekly,
+                priority: 0.7,
+                order: 20,
+                icon: 'bi bi-file-text',
+            ),
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function sitemapUrls(string $section): iterable
+    {
+        return match ($section) {
+            'page.page' => (new PageReadRepository())->sitemapUrls(),
+            'page.group' => (new GroupReadRepository())->sitemapUrls(),
+            default => [],
+        };
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * Отпечаток есть только у страниц: у разделов нет колонок времени, и любой суррогат не заметил
+     * бы переименования — раздел честнее пересобирать всегда (см. {@see GroupReadRepository::sitemapUrls()}).
+     */
+    public function sitemapRevision(string $section): ?string
+    {
+        return match ($section) {
+            'page.page' => (new PageReadRepository())->sitemapRevision(),
+            default => null,
         };
     }
 }

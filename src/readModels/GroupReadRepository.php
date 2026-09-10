@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Besnovatyj\Page\readModels;
 
 use Besnovatyj\Contracts\search\SearchDocument;
+use Besnovatyj\Contracts\sitemap\SitemapUrl;
 use Besnovatyj\Page\entities\Group;
 use Besnovatyj\TreeManager\Manager\TreeQueryScope;
 
@@ -77,6 +78,34 @@ class GroupReadRepository
             ->orderBy(['name' => SORT_ASC])
             ->indexBy('slug')
             ->column();
+    }
+
+    /**
+     * Активные разделы страниц для карты сайта.
+     *
+     * Обход в порядке дерева (`tree`, `lft`) и глубина узла отдаются как есть: человеческая карта
+     * рисует по ним отступ, а строить вложенные списки провайдеру не приходится — это забота
+     * представления.
+     *
+     * Отпечатка свежести у разделов нет: колонок времени в дереве нет, а придумывать признак,
+     * который не заметит переименования, значило бы получить молча устаревшую карту. Разделов
+     * немного, полный обход дёшев.
+     *
+     * @return iterable<SitemapUrl>
+     */
+    public function sitemapUrls(): iterable
+    {
+        $query = Group::find()->visible()->orderBy(['tree' => SORT_ASC, 'lft' => SORT_ASC]);
+
+        /** @var Group $group */
+        foreach ($query->each(200) as $group) {
+            yield new SitemapUrl(
+                route: '/Page/page/group',
+                params: ['slug' => $group->slug],
+                title: (string)$group->name,
+                depth: (int)$group->depth,
+            );
+        }
     }
 
     /**

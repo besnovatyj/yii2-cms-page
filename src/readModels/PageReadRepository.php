@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Besnovatyj\Page\readModels;
 
 use Besnovatyj\Contracts\search\SearchDocument;
+use Besnovatyj\Contracts\sitemap\SitemapUrl;
 use Besnovatyj\Page\entities\Group;
 use Besnovatyj\Page\entities\Page;
 use Besnovatyj\TreeManager\Manager\TreeQueryScope;
@@ -128,6 +129,52 @@ class PageReadRepository
                 date: $page->created_at === null ? null : (strtotime($page->created_at) ?: null),
             );
         }
+    }
+
+    /**
+     * Опубликованные страницы для карты сайта.
+     *
+     * Тот же инвариант, что у поиска, — только публичное. Отличается набор полей: карте нужны
+     * заголовок (для человеческой карты) и дата ИЗМЕНЕНИЯ (`updated_at`), по которой краулер решает,
+     * перечитывать ли страницу; поиску нужен текст и дата публикации. Поэтому два тонких метода
+     * поверх одной и той же выборки, а не один «универсальный».
+     *
+     * Порядок — как на сайте: страницы группы идут вместе и в своём порядке сортировки, чтобы
+     * человеческая карта читалась так же, как навигация.
+     *
+     * @return iterable<SitemapUrl>
+     */
+    public function sitemapUrls(): iterable
+    {
+        $query = Page::find()->visible()
+            ->orderBy(['group_id' => SORT_ASC, 'sort_order' => SORT_ASC, 'title' => SORT_ASC]);
+
+        /** @var Page $page */
+        foreach ($query->each(200) as $page) {
+            yield new SitemapUrl(
+                route: '/Page/page/view',
+                params: ['slug' => $page->slug],
+                title: (string)$page->title,
+                // updated_at здесь DATETIME-строка, а контракт ждёт Unix-timestamp.
+                lastModified: $page->updated_at === null ? null : (strtotime($page->updated_at) ?: null),
+            );
+        }
+    }
+
+    /**
+     * Отпечаток состояния страниц для карты сайта: число публичных страниц и время последней правки.
+     *
+     * Одного `MAX(updated_at)` мало — он не замечает удаления страницы, а удалённая страница обязана
+     * исчезнуть из карты. Пара «сколько + когда» это закрывает и стоит одного запроса.
+     */
+    public function sitemapRevision(): string
+    {
+        $row = Page::find()->visible()
+            ->select(['total' => 'COUNT(*)', 'latest' => 'MAX(updated_at)'])
+            ->asArray()
+            ->one();
+
+        return ((string)($row['total'] ?? '0')) . ':' . ((string)($row['latest'] ?? ''));
     }
 
     private function makeProvider(\yii\db\ActiveQuery $query): ActiveDataProvider
