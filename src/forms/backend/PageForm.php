@@ -74,7 +74,7 @@ class PageForm extends CompositeForm
             [['excerpt', 'content'], 'string'],
             // Пусто = базовый шаблон (разрешено). Иначе — только ключ, реально предлагаемый темой.
             ['template', 'in', 'range' => array_keys($this->templateOptions()), 'skipOnEmpty' => true],
-            ['slug', SlugValidator::class],
+            ['slug', SlugValidator::class, 'allowLeadingDigit' => true],
             [
                 'slug',
                 'unique',
