@@ -211,7 +211,7 @@ class PageController extends Controller
     }
 
     /**
-     * AJAX-сохранение контента из CKEditor (внешний виджет).
+     * AJAX-сохранение контента из редактора (внешний виджет).
      *
      * Обработка ошибок делегирована {@see \yii\web\ErrorHandler}: клиентские ошибки — типизированный
      * {@see BadRequestHttpException} (реальный HTTP 400 + сообщение); инфраструктурные исключения

@@ -64,7 +64,7 @@ use yii\web\View;
             </div>
         </div>
 
-        <!-- Контент (CKEditor) -->
+        <!-- Контент (редактор) -->
         <div class="card shadow-sm mb-3">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <span><i class="bi bi-body-text me-1"></i>Контент</span>
