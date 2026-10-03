@@ -7,6 +7,9 @@
 
 declare(strict_types=1);
 
+use Besnovatyj\Contracts\adminMenu\AdminMenuLocation;
+use Besnovatyj\Contracts\adminMenu\AdminMenuPlacement;
+
 return [
     // Страницы
     [
@@ -18,13 +21,13 @@ return [
         },
         '_meta' => [
             'placements' => [
-                [
-                    'location'      => 'left-sidebar',
-                    'group'         => 'Page',
-                    'groupIcon'     => 'bi bi-journal-text',
-                    'priority'      => 100,
-                    'groupPriority' => 100,
-                ],
+                new AdminMenuPlacement(
+                    location: AdminMenuLocation::LeftSidebar,
+                    group: 'Page',
+                    groupIcon: 'bi bi-journal-text',
+                    groupPriority: 100,
+                    priority: 100,
+                ),
             ],
         ],
     ],
@@ -39,13 +42,13 @@ return [
         },
         '_meta' => [
             'placements' => [
-                [
-                    'location'      => 'left-sidebar',
-                    'group'         => 'Page',
-                    'groupIcon'     => 'bi bi-journal-text',
-                    'priority'      => 200,
-                    'groupPriority' => 100,
-                ],
+                new AdminMenuPlacement(
+                    location: AdminMenuLocation::LeftSidebar,
+                    group: 'Page',
+                    groupIcon: 'bi bi-journal-text',
+                    groupPriority: 100,
+                    priority: 200,
+                ),
             ],
         ],
     ],

@@ -10,7 +10,6 @@ namespace Besnovatyj\Page;
 
 use Besnovatyj\Kernel\module\CmsModule;
 use Besnovatyj\Contracts\module\DeclaresModule;
-use Besnovatyj\Contracts\module\ProvidesAdminMenu;
 use Besnovatyj\Contracts\module\ProvidesDependencies;
 use Besnovatyj\Contracts\module\ProvidesDirectories;
 use Besnovatyj\Contracts\module\ProvidesMigrations;
@@ -33,7 +32,7 @@ use Besnovatyj\Page\repositories\PageRepository;
  * Модуль управления статическими страницами
  */
 class Module extends CmsModule implements
-    DeclaresModule, ProvidesAdminMenu,
+    DeclaresModule, 
     ProvidesDependencies, ProvidesDirectories,
     ProvidesMigrations, AliasTargetProvider, MenuTargetProvider, SearchableProvider,
     SitemapProvider, SitemapFreshness
@@ -45,7 +44,6 @@ class Module extends CmsModule implements
     public static function moduleId(): string { return self::MODULE_ID; }
     public static function moduleVersion(): string { return self::VERSION; }
     public static function isEditable(): bool { return self::EDITABLE; }
-    public static function adminMenu(): array { return require __DIR__.'/config/adminMenu.php'; }
     public static function moduleConfig(): array { return require __DIR__.'/config/config.php'; }
     public static function dependencies(): array { return require __DIR__.'/config/dependencies.php'; }
     public static function migrationPath(): string { return __DIR__.'/migrations'; }
